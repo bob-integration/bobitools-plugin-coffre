@@ -1,0 +1,9 @@
+{
+  "changelog": [
+    {
+      "version": "0.1.0",
+      "date": "2026-07-31",
+      "notes": "Première version. Coffre à identifiants du parc, à deux étages : un ÉQUIPEMENT (nom, adresse IP/DNS, catégorie, marque, modèle, site, étiquettes, notes) porte plusieurs ACCÈS, chacun avec son type — interface web, SSH/CLI, Telnet, FTP, RDP, VNC, SNMP, API, console série, façade, base de données, session système — son login, son mot de passe, son port et son URL. Une même caméra peut ainsi avoir « admin (web) », « root (SSH) » et sa communauté SNMP sans qu'on invente trois machines. Les mots de passe sont chiffrés au repos en AES-256-GCM avec une clé maître qui ne se trouve PAS dans la base (fichier coffre.key à côté du .db, en 0600, ou VAULT_KEY dans config_local.py) : une sauvegarde de la base seule ne rend aucun secret. Aucun mot de passe ne sort dans les listes — le révéler ou le copier est un appel explicite, journalisé nominativement dans l'audit, et l'affichage se remasque tout seul au bout de 30 s. Le PARTAGE se règle par coffre (« Régie A », « Cars », « Infra réseau »), en lecture ou en écriture, vers des utilisateurs, des GROUPES (nouvelle notion du cœur, réutilisable par l'accès aux outils) ou des rôles ; seul le propriétaire peut repartager, exporter ou supprimer. Générateur de mots de passe (caractères sûrs pour shells et consoles série), historique des rotations avec relecture des anciens mots de passe, marquage des accès non renouvelés depuis le délai réglé, recherche plein texte (jamais sur les secrets), lien direct vers l'interface web d'un équipement, import/export CSV."
+    }
+  ]
+}

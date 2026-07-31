@@ -1,0 +1,21 @@
+{
+  "license": "GPL-3.0-or-later",
+  "type": "coffre",
+  "label": "Coffre",
+  "version": "0.1.0",
+  "runtime": "inprocess",
+  "description": "Coffre à identifiants du parc : machines, caméras, interfaces… chacune avec plusieurs accès distincts (interface web, SSH/CLI, SNMP, série…), login et mot de passe. Les secrets sont chiffrés au repos (AES-GCM, clé hors base) et ne sortent jamais dans les listes : révéler ou copier un mot de passe est un geste explicite, journalisé. Les coffres se partagent à des utilisateurs, des rôles ou des groupes, en lecture ou en écriture. Générateur de mots de passe, historique des rotations, alerte de péremption, import/export CSV.",
+  "badge": { "label": "Coffre", "class": "tool-coffre", "oklch": "0.76 0.12 85" },
+  "nav": { "section": "outils", "label": "Outils", "order": 15 },
+  "ui": {
+    "page_html": "page.html",
+    "page_js": "page.js",
+    "page_css": "page.css"
+  },
+  "config_schema": [
+    { "key": "rotate_days", "type": "number", "default": 365, "min": 0, "max": 3650,
+      "label": "Signaler un mot de passe non changé depuis (jours, 0 = jamais)" },
+    { "key": "history_len", "type": "number", "default": 10, "min": 0, "max": 50,
+      "label": "Anciens mots de passe conservés par accès" }
+  ]
+}

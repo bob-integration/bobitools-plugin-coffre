@@ -1,0 +1,134 @@
+<!-- Coffre à identifiants — fragment monté par window.BTTools.coffre.mount(el, ctx). -->
+<div class="cf-app">
+  <aside class="cf-side">
+    <div class="cf-side-head">
+      <strong data-i18n="plugin.coffre.vaults">Coffres</strong><span class="cf-count" id="cf-count"></span>
+      <button class="btn btn-green" id="cf-vault-new" type="button"
+              data-i18n="plugin.coffre.vault_new">+ Coffre</button>
+    </div>
+    <ul class="cf-vaults" id="cf-vaults"><li class="meta">Chargement…</li></ul>
+    <div class="cf-side-foot">
+      <div class="cf-key" id="cf-key"></div>
+    </div>
+  </aside>
+
+  <section class="cf-main">
+    <div class="cf-toolbar">
+      <div class="cf-search">
+        <span class="cf-search-ico" aria-hidden="true">⌕</span>
+        <input type="search" id="cf-q" autocomplete="off" spellcheck="false"
+               data-i18n-ph="plugin.coffre.search"
+               placeholder="Rechercher : nom, adresse, login, site, tag…">
+      </div>
+      <button class="btn btn-green" id="cf-dev-new" type="button"
+              data-i18n="plugin.coffre.device_new">+ Équipement</button>
+      <details class="cf-menu" id="cf-io-menu">
+        <summary class="btn" title="Import / export">⋯</summary>
+        <div class="cf-menu-items" role="menu">
+          <button type="button" id="cf-share" role="menuitem"
+                  data-i18n="plugin.coffre.share_action">Partager ce coffre…</button>
+          <button type="button" id="cf-import" role="menuitem"
+                  data-i18n="plugin.coffre.import_action">Importer un CSV…</button>
+          <button type="button" id="cf-export" role="menuitem"
+                  data-i18n="plugin.coffre.export_action">Exporter en CSV (en clair)</button>
+          <button type="button" id="cf-vault-del" role="menuitem" class="cf-danger"
+                  data-i18n="plugin.coffre.vault_delete">Supprimer ce coffre</button>
+        </div>
+      </details>
+    </div>
+    <div class="cf-list" id="cf-list"><div class="meta">Chargement…</div></div>
+  </section>
+</div>
+
+<!-- Équipement (création / édition), avec ses accès. -->
+<div class="cf-modal" id="cf-dev-modal" hidden>
+  <div class="cf-modal-card cf-wide">
+    <h3 id="cf-dev-title">Nouvel équipement</h3>
+    <form id="cf-dev-form" class="cf-form" autocomplete="off">
+      <div class="cf-grid2">
+        <label><span data-i18n="plugin.coffre.f.name">Nom</span>
+          <input type="text" name="name" required maxlength="160" placeholder="ex. CAM-1 plateau"></label>
+        <label><span data-i18n="plugin.coffre.f.address">Adresse IP / DNS</span>
+          <input type="text" name="address" class="mono" maxlength="200" placeholder="10.1.20.31"></label>
+        <label><span data-i18n="plugin.coffre.f.category">Catégorie</span>
+          <select name="category" id="cf-dev-cat"></select></label>
+        <label><span data-i18n="plugin.coffre.f.site">Site / emplacement</span>
+          <input type="text" name="site" maxlength="120" placeholder="Régie A"></label>
+        <label><span data-i18n="plugin.coffre.f.vendor">Marque</span>
+          <input type="text" name="vendor" maxlength="120" placeholder="Panasonic"></label>
+        <label><span data-i18n="plugin.coffre.f.model">Modèle</span>
+          <input type="text" name="model" maxlength="120" placeholder="AW-HE130"></label>
+      </div>
+      <label><span data-i18n="plugin.coffre.f.tags">Étiquettes</span>
+        <input type="text" name="tags" maxlength="300" placeholder="ptz, plateau, 4k (séparées par des virgules)"></label>
+      <label><span data-i18n="plugin.coffre.f.notes">Notes</span>
+        <textarea name="notes" rows="2" maxlength="4000" placeholder="Particularités, contact, n° de série…"></textarea></label>
+
+      <fieldset class="cf-accounts">
+        <legend><span data-i18n="plugin.coffre.accesses">Accès</span>
+          <span class="meta" data-i18n="plugin.coffre.accesses_hint">— un par mode de connexion (web, SSH/CLI, SNMP…)</span></legend>
+        <div id="cf-acc-list"></div>
+        <button type="button" class="btn" id="cf-acc-add"
+                data-i18n="plugin.coffre.access_add">+ Ajouter un accès</button>
+      </fieldset>
+
+      <div class="cf-modal-actions">
+        <button type="button" class="btn" id="cf-dev-cancel" data-i18n="plugin.coffre.cancel">Annuler</button>
+        <button type="submit" class="btn btn-green" data-i18n="plugin.coffre.save">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Partage d'un coffre. -->
+<div class="cf-modal" id="cf-share-modal" hidden>
+  <div class="cf-modal-card">
+    <h3><span data-i18n="plugin.coffre.share_title">Partager</span> <span id="cf-share-name"></span></h3>
+    <p class="meta" data-i18n="plugin.coffre.share_hint">Le partage vaut pour tout le coffre.
+      « Lecture » permet de voir et de révéler les mots de passe ; « Écriture » permet en plus
+      d'ajouter et de modifier. Seul le propriétaire (et un administrateur) peut repartager,
+      exporter ou supprimer.</p>
+    <div class="cf-share-cols">
+      <div><h4 data-i18n="plugin.coffre.users">Utilisateurs</h4><div id="cf-share-users"></div></div>
+      <div><h4 data-i18n="plugin.coffre.groups">Groupes</h4><div id="cf-share-groups"></div></div>
+      <div><h4 data-i18n="plugin.coffre.roles">Rôles</h4><div id="cf-share-roles"></div></div>
+    </div>
+    <div class="cf-modal-actions">
+      <button type="button" class="btn" id="cf-share-cancel" data-i18n="plugin.coffre.cancel">Annuler</button>
+      <button type="button" class="btn btn-green" id="cf-share-save" data-i18n="plugin.coffre.save">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import CSV. -->
+<div class="cf-modal" id="cf-imp-modal" hidden>
+  <div class="cf-modal-card">
+    <h3 data-i18n="plugin.coffre.import_title">Importer un CSV</h3>
+    <p class="meta" data-i18n="plugin.coffre.import_hint">Colonnes attendues (séparateur « ; ») :
+      equipement;adresse;categorie;marque;modele;site;tags;notes;acces;libelle;login;mot_de_passe;port;url;notes_acces.
+      Plusieurs lignes portant le même nom d'équipement deviennent plusieurs accès d'une même
+      machine. Les mots de passe sont chiffrés à l'enregistrement — pensez à effacer le fichier
+      source ensuite.</p>
+    <input type="file" id="cf-imp-file" accept=".csv,text/csv">
+    <textarea id="cf-imp-text" rows="6" class="mono" data-i18n-ph="plugin.coffre.import_paste"
+              placeholder="…ou collez ici le contenu du CSV"></textarea>
+    <div class="cf-imp-res" id="cf-imp-res" hidden></div>
+    <div class="cf-modal-actions">
+      <button type="button" class="btn" id="cf-imp-cancel" data-i18n="plugin.coffre.close">Fermer</button>
+      <button type="button" class="btn btn-green" id="cf-imp-go" data-i18n="plugin.coffre.import_go">Importer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Historique des rotations d'un accès. -->
+<div class="cf-modal" id="cf-hist-modal" hidden>
+  <div class="cf-modal-card">
+    <h3 data-i18n="plugin.coffre.history_title">Anciens mots de passe</h3>
+    <p class="meta" data-i18n="plugin.coffre.history_hint">Utile quand un équipement n'a pas
+      suivi la dernière rotation. Chaque affichage est journalisé.</p>
+    <div id="cf-hist-list"></div>
+    <div class="cf-modal-actions">
+      <button type="button" class="btn" id="cf-hist-close" data-i18n="plugin.coffre.close">Fermer</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,120 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later
+   Copyright (C) 2026 BOBI SAS, France
+   Coffre à identifiants — styles. Variables du thème uniquement (clair/sombre suivent). */
+
+.cf-app { display: flex; gap: 16px; align-items: flex-start; }
+
+/* ── Volet des coffres ─────────────────────────────────────── */
+.cf-side { flex: 0 0 260px; display: flex; flex-direction: column; gap: 10px;
+    position: sticky; top: 0; max-height: calc(100vh - 120px); }
+.cf-side-head { display: flex; align-items: center; gap: 8px; }
+.cf-side-head .btn { margin-left: auto; }
+.cf-count { color: var(--text-muted); font-size: 0.85em; }
+.cf-vaults { list-style: none; margin: 0; padding: 0; overflow-y: auto; display: flex;
+    flex-direction: column; gap: 6px; }
+.cf-vault { border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 10px;
+    cursor: pointer; background: var(--bg-elev); }
+.cf-vault:hover { border-color: var(--accent); }
+.cf-vault.sel { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.cf-vault-top { display: flex; align-items: center; gap: 6px; }
+.cf-vault-name { font-weight: 600; flex: 1; }
+.cf-vault-sub, .cf-vault-desc { color: var(--text-muted); font-size: 0.8em; margin-top: 2px; }
+.cf-chip { font-size: 0.68em; padding: 1px 6px; border-radius: var(--radius-small); border: 1px solid var(--border);
+    color: var(--text-muted); white-space: nowrap; }
+.cf-chip.l-admin { border-color: var(--accent); color: var(--accent); }
+
+/* Clé de chiffrement : information de fond, jamais un bouton d'action. */
+.cf-side-foot { margin-top: auto; font-size: 0.8em; }
+.cf-key summary { cursor: pointer; color: var(--text-muted); }
+.cf-key-info { margin-top: 6px; color: var(--text-muted); line-height: 1.5; }
+.cf-key-path { word-break: break-all; margin-top: 4px; }
+.cf-key-bad { color: var(--status-stopped-fg); }
+
+/* ── Barre d'outils ────────────────────────────────────────── */
+.cf-main { flex: 1; min-width: 0; }
+.cf-toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+.cf-search { position: relative; flex: 1; }
+.cf-search input { width: 100%; padding-left: 26px; }
+.cf-search-ico { position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); pointer-events: none; }
+.cf-menu { position: relative; }
+.cf-menu > summary { list-style: none; cursor: pointer; }
+.cf-menu > summary::-webkit-details-marker { display: none; }
+.cf-menu-items { position: absolute; right: 0; top: calc(100% + 4px); z-index: 20;
+    background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 4px; min-width: 210px; box-shadow: var(--shadow); }
+.cf-menu-items button { display: block; width: 100%; text-align: left; background: none;
+    border: 0; color: inherit; padding: 7px 10px; border-radius: var(--radius-small); cursor: pointer; font: inherit; }
+.cf-menu-items button:hover { background: var(--bg-hover); }
+.cf-menu-items .cf-danger { color: var(--status-stopped-fg); }
+
+/* ── Équipements ───────────────────────────────────────────── */
+.cf-list { display: flex; flex-direction: column; gap: 10px; }
+.cf-dev { border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-elev);
+    padding: 10px 12px; }
+.cf-dev-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cf-dev-head h4 { margin: 0; font-size: 1em; }
+.cf-dev-meta { color: var(--text-muted); font-size: 0.85em; }
+.cf-dev-actions { margin-left: auto; display: flex; gap: 6px; }
+.cf-dev-notes { color: var(--text-muted); font-size: 0.85em; margin: 6px 0 0; white-space: pre-wrap; }
+.cf-cat { font-size: 0.7em; padding: 2px 7px; border-radius: var(--radius); border: 1px solid var(--border);
+    color: var(--text-muted); white-space: nowrap; }
+.cf-tag { font-size: 0.7em; padding: 1px 6px; border-radius: var(--radius-small); background: var(--bg-hover);
+    color: var(--text-muted); }
+
+/* ── Lignes d'accès ────────────────────────────────────────── */
+.cf-accs { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.cf-acc { display: flex; align-items: center; gap: 10px; padding: 5px 8px; border-radius: var(--radius-small);
+    background: var(--bg-hover); flex-wrap: wrap; }
+.cf-noacc { padding: 4px 8px; }
+.cf-kind { font-size: 0.72em; padding: 2px 7px; border-radius: var(--radius-small); border: 1px solid var(--border);
+    color: var(--text-muted); white-space: nowrap; min-width: 92px; text-align: center; }
+.cf-acc-label { font-size: 0.85em; color: var(--text-muted); }
+.cf-login { min-width: 120px; }
+/* Le mot de passe masqué garde sa place : la ligne ne saute pas quand on le révèle. */
+.cf-secret { min-width: 130px; letter-spacing: 0.08em; color: var(--text-muted); }
+.cf-secret.shown { color: var(--accent); letter-spacing: 0; user-select: all; }
+.cf-acc-actions { margin-left: auto; display: flex; align-items: center; gap: 2px; }
+.cf-ico { background: none; border: 0; color: var(--text-muted); cursor: pointer; font-size: 1em;
+    padding: 3px 6px; border-radius: var(--radius-small); text-decoration: none; line-height: 1; }
+.cf-ico:hover { color: var(--accent); background: var(--bg-hover); }
+.cf-flag { font-size: 0.68em; padding: 1px 6px; border-radius: var(--radius-small); border: 1px solid currentColor; }
+.cf-flag.warn { color: var(--status-warning-fg); }
+.cf-flag.bad { color: var(--status-stopped-fg); }
+
+/* ── Modales ───────────────────────────────────────────────── */
+.cf-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45); z-index: 60;
+    display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto; }
+.cf-modal[hidden] { display: none; }
+.cf-modal-card { background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px 20px; width: 100%; max-width: 560px; }
+.cf-modal-card.cf-wide { max-width: 900px; }
+.cf-modal-card h3 { margin-top: 0; }
+.cf-modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.cf-form label { display: block; margin-bottom: 10px; font-size: 0.9em; }
+.cf-form input, .cf-form select, .cf-form textarea { width: 100%; }
+.cf-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+
+/* Un accès = une ligne de saisie ; les champs secondaires passent dessous si l'écran
+   est étroit plutôt que de rétrécir le login et le mot de passe. */
+.cf-accounts { border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; margin: 6px 0 4px; }
+.cf-accounts legend { font-size: 0.85em; padding: 0 6px; }
+.cf-acc-edit { display: grid; gap: 6px; margin-bottom: 8px; align-items: center;
+    grid-template-columns: 150px 1fr 1fr 1fr auto auto 70px 1fr auto; }
+.cf-acc-edit input, .cf-acc-edit select { width: 100%; }
+@media (max-width: 1100px) {
+    .cf-acc-edit { grid-template-columns: 150px 1fr 1fr auto auto auto; }
+    .cf-acc-edit .a-port, .cf-acc-edit .a-url { grid-column: span 3; }
+    .cf-grid2 { grid-template-columns: 1fr; }
+}
+
+.cf-share-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.cf-share-cols h4 { margin: 0 0 6px; font-size: 0.85em; color: var(--text-muted); }
+.cf-share-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; font-size: 0.88em; }
+.cf-share-row .s-lvl { margin-left: auto; font-size: 0.9em; }
+@media (max-width: 800px) { .cf-share-cols { grid-template-columns: 1fr; } }
+
+.cf-hist-row { display: flex; align-items: center; gap: 10px; padding: 5px 0;
+    border-bottom: 1px solid var(--border); font-size: 0.88em; }
+.cf-imp-res { margin-top: 10px; font-size: 0.88em; }
+#cf-imp-text { width: 100%; margin-top: 8px; }
