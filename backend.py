@@ -720,6 +720,12 @@ def generate_password(length=20, symbols=True):
 
 # ─── CSV ────────────────────────────────────────────────────
 
+# Marqueur écrit dans la colonne « mot_de_passe » quand le secret existe mais n'est pas
+# déchiffrable avec la clé courante. Il est RELU à l'import (cf. _import_csv) : sans cela,
+# un aller-retour export → import transformerait le marqueur en mot de passe, et le coffre
+# affirmerait détenir un secret qui n'a jamais existé.
+CSV_ILLISIBLE = "!! ILLISIBLE !!"
+
 CSV_FIELDS = ["equipement", "adresse", "categorie", "marque", "modele", "site", "tags",
               "notes", "acces", "libelle", "login", "mot_de_passe", "port", "url",
               "notes_acces"]
@@ -731,7 +737,7 @@ def _export_csv(ctx, vault):
     buf = io.StringIO()
     w = csv.writer(buf, delimiter=";")
     w.writerow(CSV_FIELDS)
-    n_dev = n_acc = 0
+    n_dev = n_acc = n_ill = 0
     for r in _rows(ctx, SCOPE_DEVICE):
         v = r["value"]
         if v.get("vault_id") != vault["id"]:
@@ -746,14 +752,32 @@ def _export_csv(ctx, vault):
             continue
         for a in accounts:
             n_acc += 1
-            plain = decrypt(a.get("secret") or "")
+            blob = a.get("secret") or ""
+            plain = decrypt(blob)
+            # decrypt() distingue trois cas que la colonne écrivait tous en « vide » :
+            # pas de secret enregistré (""), secret lisible, et blob présent mais
+            # indéchiffrable avec la clé courante (None — base restaurée sans son
+            # coffre.key, ou clé régénérée à la volée par _load_key). Confondre les
+            # deux extrêmes est le pire résultat possible pour un export de coffre :
+            # l'exploitant croit l'accès dépourvu de mot de passe, alors que le mot de
+            # passe existe toujours sur l'équipement et vient d'être perdu. On le dit
+            # dans la cellule, faute de quoi le CSV est un inventaire mensonger.
+            if blob and plain is None:
+                n_ill += 1
+                cell = CSV_ILLISIBLE
+            else:
+                cell = plain or ""
             w.writerow(base + [a.get("kind") or "", a.get("label") or "",
-                               a.get("login") or "",
-                               "" if plain is None else plain,
+                               a.get("login") or "", cell,
                                a.get("port") or "", a.get("url") or "",
                                a.get("notes") or ""])
+    # n_acc comptait les accès PARCOURUS, pas les secrets réellement sortis : le journal
+    # certifiait « N accès EN CLAIR » y compris pour des secrets qu'aucune clé ne peut
+    # plus lire. En cas de fuite du fichier, c'est cette ligne qui sert à mesurer ce qui
+    # a été divulgué — elle doit donc compter juste, et nommer les illisibles.
     ctx.audit("export", f"coffre « {vault['name']} » : {n_dev} équipement(s), "
-                        f"{n_acc} accès EN CLAIR")
+                        f"{n_acc - n_ill} accès EN CLAIR"
+                        + (f", {n_ill} illisible(s) (clé absente ou différente)" if n_ill else ""))
     fname = re.sub(r"[^A-Za-z0-9_.-]+", "_", vault["name"]) or "coffre"
     # utf-8-sig : sans BOM, Excel ouvre les accents en mojibake.
     return Response(buf.getvalue().encode("utf-8-sig"), mimetype="text/csv; charset=utf-8",
@@ -795,6 +819,13 @@ def _import_csv(ctx, vault, text, history_len):
             }
         kind = _s(row.get("acces"), 40).lower()
         login, pw = _s(row.get("login"), 200), row.get("mot_de_passe")
+        # Cellule issue d'un export dégradé : l'accès existe, son secret était illisible.
+        # On l'importe SANS mot de passe plutôt que d'enregistrer le marqueur comme s'il
+        # en était un — mieux vaut un accès qu'on sait dépourvu de secret qu'un accès qui
+        # prétend en avoir un et fera échouer une connexion sans qu'on comprenne pourquoi.
+        if isinstance(pw, str) and pw.strip() == CSV_ILLISIBLE:
+            errors.append(f"ligne {i} : mot de passe illisible à l'export — accès importé sans secret")
+            pw = ""
         if not (kind or login or pw):
             continue
         if kind and kind not in KIND_IDS:
